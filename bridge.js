@@ -7,7 +7,7 @@ var controlpage=webpage.create();
 
 function respond(response){
 //	console.log('responding:'+response);
-	controlpage.evaluate('function(){socket.emit("res",'+JSON.stringify(response)+');}');
+	controlpage.evaluate(function(response){socket.emit("res",response);}, response);
 }
 
 var pages={};
@@ -22,7 +22,7 @@ function setupPushNotifications(id, page) {
 		page[cb] = function() { push([id, cb, Array.prototype.slice.call(arguments)]); }
 	})
 	function push(notification) {
-		controlpage.evaluate('function(){socket.emit("push",'+JSON.stringify(notification)+');}');
+		controlpage.evaluate(function(notification){socket.emit("push",notification);}, notification);
 	}
 }
 
