@@ -13,9 +13,9 @@ function unwrapArray(arr) {
 }
 
 module.exports={
-	create:function(callback){
+	create:function(callback, commandLineOptions){
 		function spawnPhantom(port){
-			var phantom=child.spawn('phantomjs',[__dirname + '/bridge.js',port]);
+			var phantom=child.spawn('phantomjs',(commandLineOptions ? commandLineOptions : []).concat([__dirname + '/bridge.js',port]));
 			phantom.stdout.on('data',function(data){
 				return console.log('phantom stdout: '+data);
 			});
