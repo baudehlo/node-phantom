@@ -12,7 +12,7 @@
   "scripts": {
     "test": "expresso"
   },
-  "dependencies": {"socket.io": ">=0.9.6"},
+  "dependencies": {"socket.io": "git+ssh://git@github.com:/baudehlo/socket.io.git"},
   "optionalDependencies": {},
   "engines": {
     "node": "*"
