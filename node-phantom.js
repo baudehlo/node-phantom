@@ -62,9 +62,9 @@ module.exports={
 				switch(response[2]){
 				case 'pageCreated':
 					var pageProxy={
-						open:function(url, callback){
+                        open:function(url, callback){
 							if(callback === undefined){
-								request(socket, [id, 'pageOpen', url]);
+                                request(socket, [id, 'pageOpen', url]);
 							}else{
 								request(socket, [id, 'pageOpenWithCallback', url], callback);
 							}
@@ -163,8 +163,14 @@ module.exports={
 				},
 				exit:function(callback){
 					request(socket,[0,'exit'],callbackOrDummy(callback));
-				}
+				},
 			};
+
+			phantom.on('exit', function (code, signal) {
+				if (proxy.onPhantomExit) {
+					proxy.onPhantomExit(code, signal);
+				}
+			})
 			
 			callback(null,proxy);
 		});
