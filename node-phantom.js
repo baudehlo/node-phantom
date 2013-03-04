@@ -186,7 +186,8 @@ module.exports = {
                 socket.on('disconnect', function() {
                     console.log('Socket disconnect:', cmds);
                     for (var cmdId in cmds) if (cmds.hasOwnProperty(cmdId)) {
-                        cmds[cmdId].cb(true);
+                        if (cmds[cmdId].cb) cmds[cmdId].cb(true);
+                        delete cmds[cmdId];
                     }
                     io.set('client store expiration', 0);
                 });
