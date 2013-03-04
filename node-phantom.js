@@ -204,12 +204,15 @@ module.exports={
 			// An exit event listener that is registered AFTER the phantomjs process
 			// is successfully created.
 			phantom.on('exit', function(code, signal){
-
 				// Close server upon phantom crash.
-				if(code !== 0 && signal === null){
+				if (code !== 0 && signal === null){
 					console.warn('phantom crash: code '+code);
 					server.close();
 				}
+				else {
+					console.warn('phantom signal:', signal);
+					server.close();
+ 				}
 			});
 		});
 	}
