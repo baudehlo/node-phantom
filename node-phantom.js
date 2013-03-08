@@ -59,7 +59,11 @@ module.exports = {
         var port = server.address().port;
         spawnPhantom(port, function(err,phantom) {
             if (err) {
-                server.close();
+                try {
+                    server.close();
+                } catch (e) {
+                    console.log('Error closing server:', e);
+                }
                 callback(true);
                 return;
             }
@@ -132,7 +136,11 @@ module.exports = {
                         break;
                     case 'phantomExited':
                         request(socket,[0,'exitAck']);
-                        server.close();
+                        try {
+                            server.close();
+                        } catch (e) {
+                            console.log('Error closing server:', e);
+                        }
                         io.set('client store expiration', 0);
                         cmds[cmdId].cb();
                         delete cmds[cmdId];
@@ -220,11 +228,19 @@ module.exports = {
                 // Close server upon phantom crash.
                 if (code !== 0 && signal === null){
                     console.warn('phantom crash: code '+code);
-                    server.close();
+                    try {
+                        server.close();
+                    } catch (e) {
+                        console.log('Error closing server:', e);
+                    }
                 }
                 else {
                     console.warn('phantom signal:', signal);
-                    server.close();
+                    try {
+                        server.close();
+                    } catch (e) {
+                        console.log('Error closing server:', e);
+                    }
                  }
             });
         });
