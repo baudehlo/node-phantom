@@ -81,7 +81,20 @@ module.exports = {
                 cmdid++;
             }
             
+            // Set up a timeout in case the Socket.io connection never opens.
+            socketioTimeout = setTimeout(function() {
+                // No connection within 5 seconds, fail.
+                try {
+                    server.close();
+                } catch (e) {
+                    console.log('Error closing server:', e);
+                }
+                callback(true);
+            }, 5000);
+            
             io.sockets.on('connection', function(socket) {
+                // When Socket.io connection opens, immediately clear the timeout.
+                clearTimeout(socketioTimeout);
                 socket.on('res', function(response) {
     //                console.log(response);
                     var id = response[0];
