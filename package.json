@@ -2,7 +2,7 @@
   "author": "Alex Scheel Meyer (http://www.linkedin.com/in/alexscheelmeyer)",
   "name": "node-phantom",
   "description": "bridge between node.js and PhantomJS",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "homepage": "https://github.com/alexscheelmeyer/node-phantom",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
   "scripts": {
     "test": "expresso"
   },
-  "dependencies": {"socket.io": "git+ssh://git@github.com:/baudehlo/socket.io.git"},
+  "dependencies": {"socket.io": "git+ssh://git@github.com/baudehlo/socket.io.git"},
   "optionalDependencies": {},
   "engines": {
     "node": "*"
