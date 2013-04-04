@@ -19,7 +19,11 @@ function setupPushNotifications(id, page) {
     'onLoadStarted','onPrompt','onResourceRequested','onResourceReceived','onUrlChanged'
   ];
 	callbacks.forEach(function(cb) {
-		page[cb] = function() { push([id, cb, Array.prototype.slice.call(arguments)]); }
+		page[cb] = function(parm) {
+			var notification=Array.prototype.slice.call(arguments);
+			if((cb==='onResourceRequested')&&(parm.url.indexOf('data:image')===0)) return;
+			push([id, cb, notification]);
+		}
 	})
 	function push(notification) {
 		controlpage.evaluate(function(notification){socket.emit("push",notification);}, notification);
