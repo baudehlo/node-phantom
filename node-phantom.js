@@ -84,7 +84,6 @@ module.exports = {
 	            
 	            io.sockets.on('connection', function(socket) {
 	                // When Socket.io connection opens, immediately clear the timeout.
-	                clearTimeout(socketioTimeout);
 	                socket.on('res', function(response) {
 	    //                console.log(response);
 	                    var id = response[0];
