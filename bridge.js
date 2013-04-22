@@ -14,16 +14,20 @@ var pages={};
 var pageId=1;
 
 function setupPushNotifications(id, page) {
-	var callbacks = [
-    'onAlert','onConfirm','onConsoleMessage','onError','onInitialized','onLoadFinished',
-    'onLoadStarted','onPrompt','onResourceRequested','onResourceReceived','onUrlChanged'
-  ];
-	callbacks.forEach(function(cb) {
-		page[cb] = function() { push([id, cb, Array.prototype.slice.call(arguments)]); }
-	})
-	function push(notification) {
-		controlpage.evaluate(function(notification){socket.emit("push",notification);}, notification);
+	var callbacks=['onAlert','onConfirm','onConsoleMessage','onError','onInitialized','onLoadFinished',
+				   'onLoadStarted','onPrompt','onResourceRequested','onResourceReceived','onUrlChanged',
+				   'onCallback'];
+	function push(notification){
+		controlpage.evaluate('function(){socket.emit("push",'+JSON.stringify(notification)+');}');
 	}
+	callbacks.forEach(function(cb) {
+		page[cb]=function(parm){
+			var notification=Array.prototype.slice.call(arguments);
+			if((cb==='onResourceRequested')&&(parm.url.indexOf('data:image')===0)) return;
+			
+			push([id, cb, notification]);
+		};
+	})
 }
 
 controlpage.onAlert=function(msg){
@@ -43,6 +47,10 @@ controlpage.onAlert=function(msg){
 			var success=phantom.injectJs(request[3]);
 			respond([0,cmdId,'jsInjected',success]);
 			break;
+        case 'addCookie':
+            phantom.addCookie(request[3]);
+            respond([0,cmdId,'cookieAdded',success]);
+            break;
 		case 'exit':
 			respond([0,cmdId,'phantomExited']);	//optimistically to get the response back before the line is cut
 			break;
@@ -66,9 +74,9 @@ controlpage.onAlert=function(msg){
 				respond([id, cmdId, 'pageOpened', status]);
 			});
 			break;
-		case 'pageRelease':
-			page.release();
-			respond([id,cmdId,'pageReleased']);
+		case 'pageClose':
+			page.close();
+			respond([id,cmdId,'pageClosed']);
 			break;
 		case 'pageInjectJs':
 			var result=page.injectJs(request[3]);
@@ -87,12 +95,16 @@ controlpage.onAlert=function(msg){
 			respond([id,cmdId,'pageFileUploaded']);
 			break;
 		case 'pageEvaluate':
-			var result=page.evaluate.apply(page, request.slice(3));
+			var result=page.evaluate.apply(page,request.slice(3));
 			respond([id,cmdId,'pageEvaluated',JSON.stringify(result)]);
 			break;
 		case 'pageRender':
 			page.render(request[3]);
 			respond([id,cmdId,'pageRendered']);
+			break;
+		case 'pageRenderBase64':
+			var result=page.renderBase64(request[3]);
+			respond([id,cmdId,'pageRenderBase64Done', result]);
 			break;
 		case 'pageSet':
 			page[request[3]]=request[4];
@@ -102,7 +114,9 @@ controlpage.onAlert=function(msg){
 			var result=page[request[3]];
 			respond([id,cmdId,'pageGetDone',JSON.stringify(result)]);
 			break;
-
+		case 'pageSetFn':
+			page[request[3]] = eval('(' + request[4] + ')')
+			break;
 		default:
 			console.error('unrecognized request:'+request);
 			break;
